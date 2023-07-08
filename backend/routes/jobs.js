@@ -60,4 +60,33 @@ router.delete('/:id', (req, res) => {
   }
 });
 
+// POST /api/jobs/save
+router.post('/save', async (req, res) => {
+  try {
+    const { job } = req.body;
+
+    // Save the job to MongoDB
+    const savedJob = await Job.create(job);
+
+    res.status(200).json({ message: 'Job saved successfully.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred.' });
+  }
+});
+
+// GET /api/jobs/saved
+router.get('/saved', async (req, res) => {
+  try {
+    // Retrieve the saved jobs from MongoDB
+    const savedJobs = await Job.find();
+
+    res.status(200).json(savedJobs);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred.' });
+  }
+});
+
+
 module.exports = router;

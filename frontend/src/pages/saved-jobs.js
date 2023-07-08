@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Layout from '../components/Layout';
-import JobList from '../components/JobList';
+import Layout from '../components/Layouts';
+import JobCard from '../components/JobCard';
 
 const SavedJobsPage = () => {
   const [savedJobs, setSavedJobs] = useState([]);
@@ -10,7 +10,7 @@ const SavedJobsPage = () => {
     // Fetch user's saved jobs from backend API
     const fetchSavedJobs = async () => {
       try {
-        const response = await axios.get('/api/saved-jobs');
+        const response = await axios.get('http://localhost:5000/api/saved');
         setSavedJobs(response.data);
       } catch (error) {
         console.error(error);
@@ -25,7 +25,7 @@ const SavedJobsPage = () => {
       <div>
         <h1>Saved Jobs</h1>
         {/* Render saved job list */}
-        <JobList jobs={savedJobs} />
+        <JobCard jobs={savedJobs} />
       </div>
     </Layout>
   );

@@ -17,7 +17,6 @@ const jobSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  // Additional fields can be added as needed
 });
 
 const Job = mongoose.model('Job', jobSchema);

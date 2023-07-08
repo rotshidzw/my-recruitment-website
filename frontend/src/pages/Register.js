@@ -34,6 +34,7 @@ const SignUpForm = () => {
         setEmail('');
         setPassword('');
         setUsername('');
+        window.location.href = '/';
       } else {
         // Registration failed
         const errorData = await response.json();
@@ -47,13 +48,17 @@ const SignUpForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-      <div className="flex flex-col bg-white shadow-md px-4 sm:px-6 md:px-8 lg:px-10 py-8 rounded-3xl w-50 max-w-md">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-tl from-green-400 to-indigo-900">
+       <div className="flex items-center justify-center mb-6">
+          <img src="https://entrebyte.co.za/wp-content/uploads/2022/12/white-logo-vector.png" alt="Logo" className="h-24 mb-8" />
+        </div>
+        <div className="flex flex-col bg-white shadow-md px-4 sm:px-6 md:px-8 lg:px-10 py-8 rounded-3xl w-50 max-w-md">
+
         <div className="font-medium self-center text-xl sm:text-3xl text-gray-800">
           Join us Now
         </div>
         <div className="mt-4 self-center text-xl sm:text-sm text-gray-800">
-          Enter your credentials to get access account
+          Enter your credentials to get access to your account
         </div>
 
         <div className="mt-10">
@@ -143,25 +148,17 @@ const SignUpForm = () => {
               </button>
             </div>
           </form>
+          <div className="flex justify-center items-center mt-6">
+        <span className="text-gray-700 font-medium text-xs">
+          Already have an account?{' '}
+          <a href="/Login" className="text-xs ml-2 text-blue-500 font-semibold">
+            Login here
+          </a>
+        </span>
+      </div>
         </div>
       </div>
-      <div className="flex justify-center items-center mt-6">
-        <a
-          href="#"
-          target="_blank"
-          className="inline-flex items-center text-gray-700 font-medium text-xs text-center"
-        >
-          <span className="ml-2">
-            You have an account?{' '}
-            <a
-              href="#"
-              className="text-xs ml-2 text-blue-500 font-semibold"
-            >
-              Login here
-            </a>
-          </span>
-        </a>
-      </div>
+
     </div>
   );
 };

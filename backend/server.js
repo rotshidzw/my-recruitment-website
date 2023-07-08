@@ -39,7 +39,37 @@ app.use('/api', formRoutes);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // JobForm API route
+// Job model
+const jobSchema = new mongoose.Schema({
+  title: String,
+  companyName: String,
+  description: String,
+});
 
+const Job = mongoose.model('Job', jobSchema);
+
+// Middleware
+app.use(bodyParser.json());
+
+// Save job endpoint
+app.post('/api/saveJob', (req, res) => {
+  const { title, companyName, description } = req.body;
+
+  // Create a new job document
+  const job = new Job({
+    title,
+    companyName,
+    description,
+  });
+
+  job.save((error) => {
+    if (error) {
+      res.status(500).json({ error: 'Failed to save job' });
+    } else {
+      res.status(200).json({ message: 'Job saved successfully' });
+    }
+  });
+});
 
 
 // Start the server

@@ -2,12 +2,12 @@ import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { UserIcon } from '@heroicons/react/20/solid';
-
+import { useState, useEffect } from 'react';
 const navigation = [
-  { name: 'FindJobs', href: '#', current: true },
-  { name: 'Saved Jobs', href: '#', current: false },
-  { name: 'Upload', href: '#', current: false },
-  { name: 'About Us', href: '#', current: false },
+  { name: 'FindJobs', href: '/', current: true },
+  { name: 'Saved Jobs', href: '/saved-jobs', current: false },
+  { name: 'jobs', href: '/jobs', current: false },
+  { name: 'About Us', href: '/#', current: false },
 ]
 
 function classNames(...classes) {
@@ -15,6 +15,31 @@ function classNames(...classes) {
 }
 
 export default function Example() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+
+  const handleSignOut = async () => {
+    try {
+      // Make an API call to the backend to sign out the user
+      const response = await fetch('http://localhost:5000/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include', // Include credentials for cookies
+      });
+
+      if (response.ok) {
+        // Sign-out successful
+        setIsLoggedIn(false);
+      } else {
+        // Handle sign-out error
+        console.error('Failed to sign out.');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const authButtonText = isLoggedIn ? 'Sign Out' : 'Sign In';
+
   return (
     <Disclosure as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -60,13 +85,7 @@ export default function Example() {
             </div>
 
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                <button
-                  type="button"
-                  className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                >
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
+
 
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3">
@@ -98,12 +117,12 @@ export default function Example() {
                       </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
-                          <a
-                            href="#"
+                          <button
+                          onClick={handleSignOut}
                             className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                           >
-                            Sign out
-                          </a>
+                            {authButtonText}
+                          </button>
                         )}
                       </Menu.Item>
                     </Menu.Items>

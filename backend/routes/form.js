@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const JobForm = require('../models/ApplicationForm');
 
+
 // Set up multer for handling file uploads
 const upload = multer({ dest: 'uploads/' });
 
