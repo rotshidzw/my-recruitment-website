@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Filter from './JobFilter';
+import { FaEyeSlash, FaSort } from 'react-icons/fa';
 
 const HeroSection = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -8,80 +8,190 @@ const HeroSection = () => {
   const [timezone, setTimezone] = useState('');
   const [jobs, setJobs] = useState([]);
   const [error, setError] = useState(null);
+  const [isHidden, setIsHidden] = useState(false);
+  const [filter, setFilter] = useState('');
+  const [sort, setSort] = useState('');
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [showDescription, setShowDescription] = useState(false);
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/jobs?search=${searchQuery}&country=${country}&timezone=${timezone}&filter=${filter}&sort=${sort}`
+        );
+        setJobs(response.data.data);
+      } catch (error) {
+        setError(error.message);
+      }
+    };
 
-  const handleSearch = async () => {
-    try {
-      const response = await axios.get(`http://localhost:5000/api/jobs?search=${searchQuery}&country=${country}&timezone=${timezone}`);
-      console.log(response.data); // Verify the structure and contents of response.data
-      setJobs(response.data);
-    } catch (error) {
-      setError(error.message);
-    }
-  };
+    fetchJobs();
+  }, [searchQuery, country, timezone, filter, sort]);
 
   const handleClear = () => {
     setSearchQuery('');
     setCountry('');
     setTimezone('');
+    setFilter('');
+    setSort('');
+  };
+
+  const handleHide = () => {
+    setIsHidden(!isHidden);
+  };
+
+  const handleFilterChange = (e) => {
+    setFilter(e.target.value);
+  };
+
+  const handleSortChange = (e) => {
+    setSort(e.target.value);
+  };
+
+  const filteredJobs = jobs.filter((job) => {
+    const titleMatch = job.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const companyMatch = job.company_name.toLowerCase().includes(searchQuery.toLowerCase());
+    const remoteMatch = job.remote === (filter === 'remote');
+    return titleMatch || companyMatch || remoteMatch;
+  });
+
+  const sortedJobs = [...filteredJobs].sort((a, b) => {
+    if (sort === 'date') {
+      return a.created_at - b.created_at;
+    } else if (sort === 'tags') {
+      const aHasITTag = a.tags.includes('IT');
+      const bHasITTag = b.tags.includes('IT');
+      const aHasRemoteTag = a.tags.includes('Remote');
+      const bHasRemoteTag = b.tags.includes('Remote');
+
+      if (aHasITTag && bHasITTag) {
+        if (aHasRemoteTag && bHasRemoteTag) {
+          return 0;
+        } else if (aHasRemoteTag) {
+          return -1;
+        } else if (bHasRemoteTag) {
+          return 1;
+        } else {
+          return 0;
+        }
+      } else if (aHasITTag) {
+        return -1;
+      } else if (bHasITTag) {
+        return 1;
+      } else {
+        return 0;
+      }
+    } else if (sort === 'location') {
+      return a.location.localeCompare(b.location);
+    } else {
+      return 0;
+    }
+  });
+
+  const handleApplyNow = () => {
+    if (selectedJob) {
+      // Redirect to application form page with job ID
+      window.location.href = `/ApplicationForm?jobId=${selectedJob.slug}`;
+    }
   };
 
   return (
-    <section className="bg-white ">
-      <div className="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12">
-        <div className="mr-auto place-self-center lg:col-span-7">
-          <h1 className="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl ">
-            recruitment website
-          </h1>
-          <p className="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">
-            From checkout to global sales tax compliance, companies around the world use Flowbite to simplify their payment stack.
+    <section className="bg-white">
+      <div className="container mx-auto py-10 px-4">
+            <div class="bg-blue-500 py-16 rounded">
+        <div class="container mx-auto px-4">
+          <h1 class="text-4xl font-bold text-white mb-6">Welcome to the Hero Section</h1>
+          <p class="text-lg text-white max-w-xl">
+            Hey there! How are you doing? I hope you're having a fantastic day. It's always great to connect with new people and have meaningful conversations. If you have any questions or need assistance, feel free to reach out. Remember to stay positive and keep smiling!
           </p>
-          <div className="flex flex-col space-y-4 mb-8">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="border border-gray-300 rounded-md px-4 py-2"
-              placeholder="Job title or keyword"
-            />
-            <input
-              type="text"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              className="border border-gray-300 rounded-md px-4 py-2"
-              placeholder="Country or timezone"
-            />
-            <div className="flex flex-col lg:flex-row lg:space-x-4 lg:items-center">
-              <button
-                onClick={handleSearch}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-              >
-                Search
-              </button>
-              <button
-                onClick={handleClear}
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
-              >
-                Clear
-              </button>
-            </div>
-          </div>
-          {error && <p>Error: {error}</p>}
-          <ul className="job-list">
-            {jobs && jobs.data ? (
-              jobs.data.slice(0, 10).map((job) => (
-                <li key={job.slug} className="bg-white shadow-md p-4 rounded-md mb-4">
-                  <h3 className="text-xl font-bold mb-2">{job.title}</h3>
-                  <p className="text-gray-600">{job.company_name}</p>
-                  {/* Render other job details */}
-                </li>
-              ))
-            ) : (
-              <p>Loading...</p>
-            )}
-          </ul>
         </div>
-        <div className="hidden lg:block lg:col-span-5">
-          <Filter />
+      </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 mt-12">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border border-gray-300 rounded-md px-4 py-2 placeholder-gray-400"
+            placeholder="Job title or keyword"
+          />
+          <input
+            type="text"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            className="border border-gray-300 rounded-md px-4 py-2 placeholder-gray-400"
+            placeholder="Country or timezone"
+          />
+          <select
+            value={filter}
+            onChange={handleFilterChange}
+            className="border border-gray-300 rounded-md px-4 py-2"
+          >
+            <option value="">All</option>
+            <option value="full-time">Full Time</option>
+            <option value="part-time">Part Time</option>
+            <option value="remote">Remote</option>
+          </select>
+          <select
+            value={sort}
+            onChange={handleSortChange}
+            className="border border-gray-300 rounded-md px-4 py-2"
+          >
+            <option value="">Sort By</option>
+            <option value="date">Date</option>
+            <option value="salary">Salary</option>
+            <option value="location">Location</option>
+          </select>
+          <div className="flex justify-center md:col-span-2 lg:col-span-4 xl:col-span-5">
+            <button
+              onClick={handleClear}
+              className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-12 rounded ml-2"
+            >
+              Clear
+            </button>
+            <button
+              onClick={handleHide}
+              className="bg-gray-500 hover:bg-gray-400 text-white font-bold py-2 px-12 rounded ml-2"
+            >
+              {isHidden ? <FaEyeSlash className="mr-2" /> : <FaEyeSlash className="mr-2" />}
+              {isHidden ? 'Show' : 'Hide'}
+            </button>
+          </div>
+        </div>
+
+
+
+      </div>
+      <div class="shadow-xl mt-8 mr-0 mb-0 ml-0 pt-4 pr-10 pb-4 pl-10 flow-root rounded-lg sm:py-2">
+        <div class="pt--10 pr-0 pb-10 pl-0">
+          {!isHidden && (
+            <div class="pt-5 pr-0 pb-0 pl-0 mt-5 mr-0 mb-0 ml-0 ">
+               <div class="">
+          <p class="text-xl font-bold text-gray-900">Open Positions</p>
+          <p class="text-sm mt-1 mr-0 mb-0 ml-0 font-semi-bold text-gray-500">Lorem ipsum dolor sit amet, consectetur adipis</p>
+        </div>
+              {sortedJobs.length > 0 ? (
+                sortedJobs.slice(0, 10).map((job) => (
+                  <div key={job.slug} class="pt-5 pr-0 pb-0 pl-0 mt-5 mr-0 mb-0 ml-0">
+                    <div class="sm:flex sm:items-center sm:justify-between sm:space-x-5 rounded shadow-sm">
+                      <div class="flex items-center flex-1 min-w-0">
+                        <img src='https://v1.tailwindcss.com/_next/static/media/tailwind-ui-sidebar.2ccd3a8ec5f31f428204b5c3c4d9a485.png' class="flex-shrink-0 object-cover rounded-full btn- w-10 h-10" />
+                        <div class="mt-0 mr-0 mb-0 ml-4 flex-1 min-w-0">
+                          <p class="text-lg font-bold text-gray-800 truncate">{job.title}</p>
+                          <p class="text-gray-600 text-md">{job.company_name}</p>
+                        </div>
+                      </div>
+                      <div class="mt-4 mr-0 mb-0 ml-0 pt-0 pr-0 pb-0 pl-14 flex items-center sm:space-x-6 sm:pl-0 sm:mt-0">
+                        <button onClick={handleApplyNow} class="bg-gray-800 pt-2 pr-6 pb-2 pl-6 text-lg font-medium text-gray-100 transition-all duration-200 hover:bg-gray-700 rounded-lg">Apply</button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>No jobs found.</p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </section>

@@ -2,7 +2,7 @@ import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { UserIcon } from '@heroicons/react/20/solid';
-import { useState, useEffect } from 'react';
+
 const navigation = [
   { name: 'FindJobs', href: '/', current: true },
   { name: 'Saved Jobs', href: '/saved-jobs', current: false },
@@ -15,30 +15,6 @@ function classNames(...classes) {
 }
 
 export default function Example() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-
-  const handleSignOut = async () => {
-    try {
-      // Make an API call to the backend to sign out the user
-      const response = await fetch('http://localhost:5000/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include', // Include credentials for cookies
-      });
-
-      if (response.ok) {
-        // Sign-out successful
-        setIsLoggedIn(false);
-      } else {
-        // Handle sign-out error
-        console.error('Failed to sign out.');
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const authButtonText = isLoggedIn ? 'Sign Out' : 'Sign In';
 
   return (
     <Disclosure as="nav" className="bg-gray-800">
@@ -108,21 +84,21 @@ export default function Example() {
                       <Menu.Item>
                         {({ active }) => (
                           <a
-                            href="#"
+                            href="/Login"
                             className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                           >
-                            Your Profile
+                            Login
                           </a>
                         )}
                       </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
-                          <button
-                          onClick={handleSignOut}
+                          <a
+                            href="/Register"
                             className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                           >
-                            {authButtonText}
-                          </button>
+                            Signup
+                          </a>
                         )}
                       </Menu.Item>
                     </Menu.Items>
