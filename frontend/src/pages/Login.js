@@ -49,7 +49,7 @@ const LoginForm = () => {
     }
   };
   return (
-    
+
     <div className="h-full bg-gradient-to-tl from-green-400 to-indigo-900 w-full py-16 px-4">
       <div className="flex flex-col items-center justify-center">
       <img src="https://entrebyte.co.za/wp-content/uploads/2022/12/white-logo-vector.png" alt="Logo" className="h-24 mb-8" />

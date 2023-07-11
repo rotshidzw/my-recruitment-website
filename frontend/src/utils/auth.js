@@ -19,3 +19,15 @@ export const removeToken = () => {
   // Remove the token cookie
   document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 };
+export function getCookie(name) {
+  if (typeof window !== 'undefined') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.startsWith(name + '=')) {
+        return cookie.substring(name.length + 1, cookie.length);
+      }
+    }
+  }
+  return '';
+}

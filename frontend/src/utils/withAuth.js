@@ -11,7 +11,7 @@ const withAuth = (WrappedComponent) => {
 
       // Redirect to login page if token is not found
       if (!token) {
-        router.push('/login'); // Replace '/login' with your login page route
+        router.push('/Login'); // Replace '/login' with your login page route
       }
     }, []);
 
