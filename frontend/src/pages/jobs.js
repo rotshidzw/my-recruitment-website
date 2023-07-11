@@ -2,11 +2,14 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import  Performance  from '../components/perfomance';
 import Layout from '@/components/Layouts';
+import Cookies from 'js-cookie';
+
+
 const JobsPage = () => {
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
-
+  const hasCookies = Cookies.get('token');
   useEffect(() => {
     // Fetch all jobs from the backend API
     const fetchJobs = async () => {
@@ -147,9 +150,11 @@ const JobsPage = () => {
               <button className="bg-blue-500 text-white rounded-md py-2 px-4" onClick={handleApply}>
                 Apply
               </button>
-              <button className="bg-green-500 text-white rounded-md py-2 px-4" onClick={handleSave}>
+             {hasCookies && (
+             <button className="bg-green-500 text-white rounded-md py-2 px-4" onClick={handleSave}>
                 Save
               </button>
+                )}
             </div>
           </div>
         )}

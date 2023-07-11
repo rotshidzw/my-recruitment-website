@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-
   const router = useRouter();
 
   const handleSubmit = async (e) => {
@@ -14,7 +13,7 @@ const LoginForm = () => {
     // Create a new user object
     const user = {
       email,
-      password
+      password,
     };
 
     try {
@@ -22,19 +21,22 @@ const LoginForm = () => {
       const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(user)
+        body: JSON.stringify(user),
       });
 
       if (response.ok) {
         // Login successful
         setMessage('Login successful!');
         const data = await response.json();
-        const userId = data.sessionid; // Retrieve the user ID from the response
+        const token = data.token; // Retrieve the JWT token from the response
 
-        // Redirect to homepage with the user ID as a query parameter
-        router.push(`/#?userId=${userId}`);
+        // Set the token as a cookie
+        document.cookie = `token=${token}; path=/`; // Adjust the cookie settings as needed
+
+        // Redirect to homepage
+        router.push('/'); // Update the path to your desired destination
       } else {
         // Login failed
         const errorData = await response.json();
@@ -47,6 +49,7 @@ const LoginForm = () => {
     }
   };
   return (
+    
     <div className="h-full bg-gradient-to-tl from-green-400 to-indigo-900 w-full py-16 px-4">
       <div className="flex flex-col items-center justify-center">
       <img src="https://entrebyte.co.za/wp-content/uploads/2022/12/white-logo-vector.png" alt="Logo" className="h-24 mb-8" />

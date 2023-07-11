@@ -2,7 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
-
+const cookieParser = require('cookie-parser');
+//const {cookieJwtAuth} = require('./middleware/cookieJwtAuth')
 
 require('dotenv').config(); // Load environment variables from .env file
 
@@ -31,45 +32,20 @@ mongoose
 const jobsRouter = require('./routes/jobs');
 const authRouter = require('./routes/auth');
 const formRoutes = require('./routes/form');
+const protectedRoutes = require('./routes/protected');
+const savedJobsRoute = require('./routes/saveJobs');
 
 app.use('/api/jobs', jobsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api', formRoutes);
+app.use('/api', protectedRoutes);
+app.use('/api/save-jobs', savedJobsRoute); // Mount under the correct path
+app.use(cookieParser());
 // Serve static files (e.g., the frontend build files)
 app.use(express.static(path.join(__dirname, 'public')));
 
 // JobForm API route
-// Job model
-const jobSchema = new mongoose.Schema({
-  title: String,
-  companyName: String,
-  description: String,
-});
 
-const Job = mongoose.model('Job', jobSchema);
-
-// Middleware
-app.use(bodyParser.json());
-
-// Save job endpoint
-app.post('/api/saveJob', (req, res) => {
-  const { title, companyName, description } = req.body;
-
-  // Create a new job document
-  const job = new Job({
-    title,
-    companyName,
-    description,
-  });
-
-  job.save((error) => {
-    if (error) {
-      res.status(500).json({ error: 'Failed to save job' });
-    } else {
-      res.status(200).json({ message: 'Job saved successfully' });
-    }
-  });
-});
 
 
 // Start the server

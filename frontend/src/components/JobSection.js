@@ -1,41 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const JobSection = () => {
-    const [jobs, setJobs] = useState([]);
-    const [displayedJobs, setDisplayedJobs] = useState([]);
-    const [error, setError] = useState(null);
-    const [selectedJob, setSelectedJob] = useState(null);
-    const [showDescription, setShowDescription] = useState(false);
-    useEffect(() => {
-      const fetchJobs = async () => {
-        try {
-          const response = await axios.get('http://localhost:5000/api/jobs');
-          console.log(response.data);
-          setJobs(response.data);
-        } catch (error) {
-          setError(error.message);
-        }
-      };
+  const [jobs, setJobs] = useState([]);
+  const [displayedJobs, setDisplayedJobs] = useState([]);
+  const [error, setError] = useState(null);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [showDescription, setShowDescription] = useState(false);
+  const hasCookies = Cookies.get('token'); // Check if the token cookie exists
 
-      fetchJobs();
-    }, []);
-
-    useEffect(() => {
-      if (jobs && jobs.data) {
-        const shuffledJobs = shuffleArray(jobs.data).slice(0, 4);
-        setDisplayedJobs(shuffledJobs);
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/jobs');
+        console.log(response.data);
+        setJobs(response.data);
+      } catch (error) {
+        setError(error.message);
       }
-    }, [jobs]);
+    };
 
-    const shuffleArray = (array) => {
-        const shuffledArray = [...array];
-        for (let i = shuffledArray.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
-        }
-        return shuffledArray;
-      };
+    fetchJobs();
+  }, []);
+
+  useEffect(() => {
+    if (jobs && jobs.data) {
+      const shuffledJobs = shuffleArray(jobs.data).slice(0, 4);
+      setDisplayedJobs(shuffledJobs);
+    }
+  }, [jobs]);
+
+  const shuffleArray = (array) => {
+    const shuffledArray = [...array];
+    for (let i = shuffledArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+    }
+    return shuffledArray;
+  };
 
   const handleApply = (job) => {
     if (selectedJob === job) {
@@ -54,18 +57,35 @@ const JobSection = () => {
     }
   };
 
-  const handleSave = () => {
-    // Check if user is signed in
-    const isLoggedIn = true; // Replace with your authentication logic
+  const handleSaveJob = async (job) => {
+    if (!hasCookies) {
+      return; // Return early if cookies are not present
+    }
 
-    if (isLoggedIn) {
-      // Save job functionality
-      console.log('Job saved!');
-    } else {
-      // Redirect to sign-in page
-      window.location.href = '/sign-in';
+    try {
+      const response = await axios.post('http://localhost:5000/api/save-jobs/save', {
+        job: {
+          slug: job.slug,
+          company_name: job.company_name,
+          title: job.title,
+          description: job.description,
+          remote: job.remote,
+          url: job.url,
+          tags: job.tags,
+          job_types: job.job_types,
+          location: job.location,
+          created_at: job.created_at
+        }
+      });
+
+      const savedJob = response.data;
+      console.log('Job saved:', savedJob);
+      // Refresh the saved jobs list if needed
+    } catch (error) {
+      console.error('Error saving job:', error);
     }
   };
+
 
   const removeHtmlTags = (htmlString) => {
     const tempDiv = document.createElement('div');
@@ -114,10 +134,11 @@ const JobSection = () => {
                           />
                         </svg>
                       </button>
-                      <button
-                        className="text-blue-500 hover:text-blue-700"
-                        onClick={handleSave}
-                        >
+                      {hasCookies && (
+                        <button  className="text-blue-500 hover:text-blue-700"
+                        onClick={() => handleSaveJob(selectedJob)}>
+                          Save
+
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-6 w-6"
@@ -132,8 +153,9 @@ const JobSection = () => {
                             d="M12 6h9m0 0v9m0-9l-9 9-9-9"
                             />
                         </svg>
-                        <span className="ml-1">Save</span>
+
                         </button>
+                           )}
 
                     </div>
                   </div>
@@ -159,7 +181,7 @@ const JobSection = () => {
 
                 <div className="w-full md:w-1/2 md:px-1 lg:px-20 ">
                      <img src="https://cdn.tuk.dev/assets/components/26May-update/newsletter-1.png" alt="Envelope with a newsletter" role="img" className="h-fit xl:w-fit lg:w-1/2 w-fit " /><h1 className="text-2xl md:text-4xl xl:text-5xl font-bold leading-10 text-gray-800 mb-4 text-center xl:text-left md:mt-0 mt-4">Subscribe</h1>
-                    <p className="text-base leading-normal text-gray-600 text-center xl:text-left">Whether article spirits new her covered hastily sitting her. Money witty books nor son add.</p>
+                    <p className="text-base leading-normal text-gray-600 text-center xl:text-left">Hi everyone 🙌</p>
                     <div className="flex items-stretch mt-12">
                         <input className="bg-gray-100 rounded-lg rounded-r-none text-base leading-none text-gray-800 p-5 w-4/5 border border-transparent focus:outline-none focus:border-gray-500" type="email" placeholder="Your Email" />
                         <button className="w-32 rounded-l-none hover:bg-indigo-600 bg-indigo-700 rounded text-base font-medium leading-none text-white p-5 uppercase focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700">subscribe</button>

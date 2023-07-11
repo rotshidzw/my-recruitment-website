@@ -1,4 +1,4 @@
-const Job = require('../models/job');
+const Job = require('../models/Job');
 
 // GET /api/jobs
 exports.getJobs = async (req, res) => {

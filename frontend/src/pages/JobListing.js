@@ -1,7 +1,7 @@
-// JobListing.js
-
 import { useState } from 'react';
 import axios from 'axios';
+
+ // Retrieve the JWT token
 
 const JobListing = ({ job, onSave }) => {
   const [isSaved, setIsSaved] = useState(false);

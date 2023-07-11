@@ -7,6 +7,8 @@ import Cookies from 'js-cookie';
 import { useEffect } from 'react';
 const inter = Inter({ subsets: ['latin'] })
 
+
+
 export default function Home() {
 
   return (

@@ -1,9 +1,39 @@
-import React, { useState } from 'react';
-import Layout from '../components/Layouts'
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { parseCookies } from 'nookies';
+import { getToken } from '../utils/auth';
+
+import Layout from '../components/Layouts';
+
 const ApplicationForm = ({ jobSlug }) => {
+  const router = useRouter();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [cv, setCV] = useState(null);
+
+  useEffect(() => {
+    const cookies = parseCookies();
+    const token = cookies.token;
+
+    if (token) {
+      // Retrieve user data from the API using the token
+      fetch('http://localhost:5000/api/user', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // Set the user data in the form fields
+          setFullName(data.fullName);
+          setEmail(data.email);
+        })
+        .catch((error) => {
+          console.error(error);
+          alert('An error occurred while retrieving user data.');
+        });
+    }
+  }, []);
 
   const handleFullNameChange = (e) => {
     setFullName(e.target.value);
@@ -35,7 +65,7 @@ const ApplicationForm = ({ jobSlug }) => {
 
     // Send form data to backend along with the job slug
     // Replace the URL with your backend endpoint for submitting applications
-    fetch(`http://localhost:5000/api/applications`, {
+    fetch(`http://localhost:5000/api/applications/${jobSlug}`, {
       method: 'POST',
       body: formData,
     })
@@ -44,12 +74,18 @@ const ApplicationForm = ({ jobSlug }) => {
         // Handle response from backend
         console.log(data);
         alert('Application submitted successfully!');
+        router.push('/success'); // Redirect to success page
       })
       .catch((error) => {
         // Handle error
         console.error(error);
         alert('An error occurred while submitting the application.');
       });
+
+    // Clear form fields
+    setFullName('');
+    setEmail('');
+    setCV(null);
   };
 
   return (

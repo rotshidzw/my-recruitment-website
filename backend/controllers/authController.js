@@ -24,7 +24,13 @@ exports.registerUser = async (req, res) => {
     });
 
     // Generate an authentication token
-    const token = jwt.sign({ userId: newUser._id }, '0545471d-a960-4a68-8f37-ffe4c6fe3e53');
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET);
+
+    // Set the token as a cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    });
 
     res.status(201).json({ token });
   } catch (error) {
@@ -51,9 +57,38 @@ exports.loginUser = async (req, res) => {
     }
 
     // Generate an authentication token
-    const token = jwt.sign({ userId: user._id }, '0545471d-a960-4a68-8f37-ffe4c6fe3e53');
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+
+    // Set the token as a cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    });
 
     res.json({ token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred.' });
+  }
+};
+
+// GET /api/user
+exports.getUserData = async (req, res) => {
+  try {
+    // Retrieve user data from the database
+    const userId = req.userId; // Assuming you set the user ID in the authenticateToken middleware
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    // Send the user data as a response
+    res.json({
+      fullName: user.fullName,
+      email: user.email,
+      // Add any additional user data fields you want to include
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'An error occurred.' });
