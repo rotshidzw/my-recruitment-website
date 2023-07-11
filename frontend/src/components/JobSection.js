@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-
+import { motion } from 'framer-motion';
 const JobSection = () => {
   const [jobs, setJobs] = useState([]);
   const [displayedJobs, setDisplayedJobs] = useState([]);
@@ -58,8 +58,8 @@ const JobSection = () => {
   };
 
   const handleSaveJob = async (job) => {
-    if (!hasCookies) {
-      return; // Return early if cookies are not present
+    if (!hasCookies || !job || !job.company_name) {
+      return; // Return early if cookies are not present or the job or job.company_name is null
     }
 
     try {
@@ -80,29 +80,48 @@ const JobSection = () => {
 
       const savedJob = response.data;
       console.log('Job saved:', savedJob);
+      alert('Job saved successfully!');
       // Refresh the saved jobs list if needed
     } catch (error) {
       console.error('Error saving job:', error);
     }
   };
 
-
   const removeHtmlTags = (htmlString) => {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlString;
     return tempDiv.textContent || tempDiv.innerText || '';
   };
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  };
 
-
+  const slideIn = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
+  };
   return (
     <section className="bg-white ">
       <div className="container mx-auto flex flex-col md:flex-row">
         <div className="w-1/1 ">
-          <h2 className="text-2xl font-bold mb-4">Most Recent</h2>
+        <motion.h2
+            className="text-2xl font-bold mb-4"
+            variants={fadeIn}
+            initial="hidden"
+            animate="visible"
+          >Most Recent</motion.h2>
           <ul className="space-y-6">
           {displayedJobs && displayedJobs.length > 0 ? (
               displayedJobs.map((job) => (
-                <li key={job.slug} className="bg-white shadow-md p-4 rounded-md">
+                <motion.li
+                key={job.slug}
+                className="bg-white shadow-md p-4 rounded-md"
+                variants={slideIn}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.3}}
+              >
                   <div className="flex items-start justify-between">
                     <div>
                       <h3 className="text-xl font-bold mb-2">{job.title}</h3>
@@ -117,7 +136,7 @@ const JobSection = () => {
                     <div>
                       <button
                         className="text-blue-500 hover:text-blue-700 mr-2"
-                        onClick={() => handleApply(job)}
+                        onClick={() => handleSaveJob(job)}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -135,27 +154,24 @@ const JobSection = () => {
                         </svg>
                       </button>
                       {hasCookies && (
-                        <button  className="text-blue-500 hover:text-blue-700"
-                        onClick={() => handleSaveJob(selectedJob)}>
+                        <button className="text-blue-500 hover:text-blue-700" onClick={() => handleSaveJob(job)}>
                           Save
-
-                        <svg
+                          <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-6 w-6"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
-                        >
+                          >
                             <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 6h9m0 0v9m0-9l-9 9-9-9"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 6h9m0 0v9m0-9l-9 9-9-9"
                             />
-                        </svg>
-
+                          </svg>
                         </button>
-                           )}
+                      )}
 
                     </div>
                   </div>
@@ -171,7 +187,7 @@ const JobSection = () => {
                       </button>
                     </div>
                   )}
-                </li>
+                </motion.li>
               ))
             ) : (
               <p>Loading...</p>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaEyeSlash, FaSort } from 'react-icons/fa';
-
+import { motion } from 'framer-motion';
 const HeroSection = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [country, setCountry] = useState('');
@@ -91,18 +91,29 @@ const HeroSection = () => {
   const handleApplyNow = (slug) => {
     window.location.href = `/ApplicationForm?jobId=${slug}`;
   };
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  };
 
+  const slideIn = {
+    hidden: { x: -50, opacity: 0 },
+    visible: { x: 0, opacity: 1 },
+  };
   return (
     <section className="bg-white">
       <div className="container mx-auto py-10 px-4">
-            <div class="bg-blue-500 py-16 rounded">
+      <motion.div
+          variants={fadeIn}
+          initial="hidden"
+          animate="visible" class="bg-blue-500 py-16 rounded">
         <div class="container mx-auto px-4">
           <h1 class="text-4xl font-bold text-white mb-6">Welcome to the Hero Section</h1>
           <p class="text-lg text-white max-w-xl">
             Hey there! How are you doing? I hope you're having a fantastic day. It's always great to connect with new people and have meaningful conversations. If you have any questions or need assistance, feel free to reach out. Remember to stay positive and keep smiling!
           </p>
         </div>
-      </div>
+      </motion.div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 mt-12">
           <input
@@ -164,13 +175,25 @@ const HeroSection = () => {
           {!isHidden && (
             <div class="pt-5 pr-0 pb-0 pl-0 mt-5 mr-0 mb-0 ml-0 ">
                <div class="">
-          <p class="text-xl font-bold text-gray-900">Open Positions</p>
+               <motion.p
+                  variants={slideIn}
+                  initial="hidden"
+                  animate="visible"
+                  className="text-xl font-bold text-gray-900"
+                >Open Positions</motion.p>
           <p class="text-sm mt-1 mr-0 mb-0 ml-0 font-semi-bold text-gray-500">Lorem ipsum dolor sit amet, consectetur adipis</p>
         </div>
               {sortedJobs.length > 0 ? (
                 sortedJobs.slice(0, 10).map((job) => (
                   <div key={job.slug} class="pt-5 pr-0 pb-0 pl-0 mt-5 mr-0 mb-0 ml-0">
-                    <div class="sm:flex sm:items-center sm:justify-between sm:space-x-5 rounded shadow-sm">
+                      <motion.div
+                    key={job.slug}
+                    variants={slideIn}
+                    initial="hidden"
+                    animate="visible"
+                    
+
+                 class="sm:flex sm:items-center sm:justify-between sm:space-x-5 rounded shadow-sm">
                       <div class="flex items-center flex-1 min-w-0">
                         <img src='https://v1.tailwindcss.com/_next/static/media/tailwind-ui-sidebar.2ccd3a8ec5f31f428204b5c3c4d9a485.png' class="flex-shrink-0 object-cover rounded-full btn- w-10 h-10" />
                         <div class="mt-0 mr-0 mb-0 ml-4 flex-1 min-w-0">
@@ -180,12 +203,12 @@ const HeroSection = () => {
                       </div>
                       <button
                         onClick={() => handleApplyNow(job.slug)}
-                        className="bg-gray-800 pt-2 pr-6 pb-2 pl-6 text-lg font-medium text-gray-100 transition-all duration-200 hover:bg-gray-700 rounded-lg"
+                        className="bg-gray-800   my-2 pt-2 pr-6 pb-2 pl-6 text-lg font-medium text-gray-100 transition-all duration-200 hover:bg-gray-700 rounded-lg"
                       >
                         Apply
                       </button>
 
-                    </div>
+                    </motion.div>
                   </div>
                 ))
               ) : (
