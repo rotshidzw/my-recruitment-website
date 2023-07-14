@@ -136,7 +136,7 @@ const JobSection = () => {
                     <div>
                       <button
                         className="text-blue-500 hover:text-blue-700 mr-2"
-                        onClick={() => handleSaveJob(job)}
+                        onClick={() =>  handleApply(job)}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -154,7 +154,7 @@ const JobSection = () => {
                         </svg>
                       </button>
                       {hasCookies && (
-                        <button className="text-blue-500 hover:text-blue-700" onClick={() => handleApply(job)}>
+                        <button className="text-blue-500 hover:text-blue-700" onClick={() => handleSaveJob(job)}>
                           Save
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
